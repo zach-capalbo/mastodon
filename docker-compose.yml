@@ -3,6 +3,7 @@ services:
   db:
     restart: always
     image: postgres:14-alpine
+    container_name: postgres
     shm_size: 256mb
     networks:
       - internal_network
@@ -15,6 +16,7 @@ services:
 
   redis:
     restart: always
+    container_name: redis
     image: redis:7-alpine
     networks:
       - internal_network
@@ -58,6 +60,7 @@ services:
     build: .
     image: tootsuite/mastodon
     restart: always
+    container_name: web
     env_file: .env.production
     command: bash -c "rm -f /mastodon/tmp/pids/server.pid; bundle exec rails s -p 3000"
     networks:
@@ -78,6 +81,7 @@ services:
   streaming:
     build: .
     image: tootsuite/mastodon
+    container_name: streaming
     restart: always
     env_file: .env.production
     command: node ./streaming
@@ -96,6 +100,7 @@ services:
   sidekiq:
     build: .
     image: tootsuite/mastodon
+    container_name: sidekiq
     restart: always
     env_file: .env.production
     command: bundle exec sidekiq

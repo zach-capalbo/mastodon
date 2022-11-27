@@ -44,7 +44,9 @@ class ComposePanel extends React.PureComponent {
 
     return (
       <div className='compose-panel' onFocus={this.onFocus}>
-        <SearchContainer openInRoute />
+        {signedIn && (
+          <SearchContainer openInRoute />
+        )}
 
         {!signedIn && (
           <React.Fragment>

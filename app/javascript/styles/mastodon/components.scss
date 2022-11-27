@@ -1864,7 +1864,7 @@ a.account__display-name {
   color: $darker-text-color;
 
   strong {
-    color: $secondary-text-color;
+    color: $primary-text-color;
   }
 
   a {
@@ -8098,7 +8098,7 @@ noscript {
 }
 
 .prose {
-  color: $secondary-text-color;
+  color: $primary-text-color;
   font-size: 15px;
   line-height: 22px;
 
@@ -8231,7 +8231,7 @@ noscript {
   h6,
   strong,
   b {
-    color: $primary-text-color;
+    color: $secondary-text-color;
     font-weight: 700;
   }
 

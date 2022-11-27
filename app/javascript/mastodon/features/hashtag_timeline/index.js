@@ -188,6 +188,15 @@ class HashtagTimeline extends React.PureComponent {
     const pinned = !!columnId;
     const { signedIn } = this.context.identity;
 
+    if (!signedIn)
+    {
+      return (
+        <Column>
+        <div>Signed-in users only. Sorry.</div>
+        </Column>
+      )
+    }
+
     let followButton;
 
     if (tag) {

@@ -51,6 +51,15 @@ class Explore extends React.PureComponent {
     const { intl, multiColumn, isSearching } = this.props;
     const { signedIn } = this.context.identity;
 
+    if (!signedIn)
+    {
+      return (
+        <Column>
+          <ColumnHeader title="Signed-in use ONLY"></ColumnHeader>
+        </Column>
+      )
+    }
+
     return (
       <Column bindToDocument={!multiColumn} ref={this.setRef} label={intl.formatMessage(messages.title)}>
         <ColumnHeader
