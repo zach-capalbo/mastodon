@@ -132,8 +132,7 @@ class About extends React.PureComponent {
 
             <div className='about__meta__column'>
               <h4><FormattedMessage id='about.contact' defaultMessage='Contact:' /></h4>
-
-              {isLoading ? <Skeleton width='10ch' /> : <a className='about__mail' href={`mailto:${server.getIn(['contact', 'email'])}`}>{server.getIn(['contact', 'email'])}</a>}
+              Please see <a href="https://zachcapalbo.com/contact">https://zachcapalbo.com/contact</a>
             </div>
           </div>
 
@@ -197,7 +196,7 @@ class About extends React.PureComponent {
                 </div>
               </>
             ) : (
-              <p><FormattedMessage id='about.not_available' defaultMessage='This information has not been made available on this server.' /></p>
+              <p>This instance blocks transphobic, homophobic, alt-right, and other undersirable content, but the exact list is not available.</p>
             ))}
           </Section>
 

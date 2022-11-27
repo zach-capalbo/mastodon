@@ -61,6 +61,10 @@ RemoteHint.propTypes = {
 export default @connect(mapStateToProps)
 class AccountTimeline extends ImmutablePureComponent {
 
+  static contextTypes = {
+    identity: PropTypes.object,
+  };
+
   static propTypes = {
     params: PropTypes.shape({
       acct: PropTypes.string,
@@ -143,6 +147,7 @@ class AccountTimeline extends ImmutablePureComponent {
 
   render () {
     const { accountId, statusIds, featuredStatusIds, isLoading, hasMore, blockedBy, suspended, isAccount, hidden, multiColumn, remote, remoteUrl } = this.props;
+    const { signedIn } = this.context.identity;
 
     if (isLoading && statusIds.isEmpty()) {
       return (
@@ -173,6 +178,13 @@ class AccountTimeline extends ImmutablePureComponent {
       emptyMessage = <RemoteHint url={remoteUrl} />;
     } else {
       emptyMessage = <FormattedMessage id='empty_column.account_timeline' defaultMessage='No posts found' />;
+    }
+    
+    if (!signedIn && remote)
+    {
+      return (
+        <Column><p>Not available.</p></Column>
+      )
     }
 
     const remoteMessage = remote ? <RemoteHint url={remoteUrl} /> : null;
