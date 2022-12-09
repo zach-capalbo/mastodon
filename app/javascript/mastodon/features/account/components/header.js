@@ -324,6 +324,7 @@ class Header extends ImmutablePureComponent {
                 )}
 
                 <DropdownMenuContainer disabled={menu.length === 0} items={menu} icon='ellipsis-v' size={24} direction='right' />
+                <IconButton icon='paperclip' size={24} title={intl.formatMessage(messages.openOriginalPage)} href={account.get('url')} />
               </div>
             )}
           </div>
