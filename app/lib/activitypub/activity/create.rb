@@ -272,8 +272,9 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
         media_attachments << media_attachment
 
         next if unsupported_media_type?(media_attachment_parser.file_content_type) || skip_download?
+        next unless Setting.download_media_enabled
 
-        media_attachment.download_file! if Setting.download_media_enabled
+        media_attachment.download_file!
         media_attachment.download_thumbnail!
         media_attachment.save
       rescue Mastodon::UnexpectedResponseError, HTTP::TimeoutError, HTTP::ConnectionError, OpenSSL::SSL::SSLError
