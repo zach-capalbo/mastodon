@@ -9,6 +9,7 @@ import classNames from 'classnames';
 import { autoPlayGif, cropImages, displayMedia, useBlurhash } from '../initial_state';
 import { debounce } from 'lodash';
 import Blurhash from 'mastodon/components/blurhash';
+import { CircularProgress } from 'mastodon/components/loading_indicator';
 
 const messages = defineMessages({
   toggle_visible: { id: 'media_gallery.toggle_visible', defaultMessage: '{number, plural, one {Hide image} other {Hide images}}' },
@@ -35,6 +36,9 @@ class Item extends React.PureComponent {
 
   state = {
     loaded: false,
+    lazyLoadURL: null,
+    lazyLoadStarted: false,
+    lazyLoadContentType: ""
   };
 
   handleMouseEnter = (e) => {
@@ -47,6 +51,16 @@ class Item extends React.PureComponent {
     if (this.hoverToPlay()) {
       e.target.pause();
       e.target.currentTime = 0;
+    }
+  }
+
+  handleAutoDownload = () => {
+    const { attachment } = this.props;
+    this.setState({lazyLoadStarted: true});
+
+    if (attachment.get('type') === 'unknown') {
+      console.log("Downloading attachment", attachment.get('url'))
+      fetch(attachment.get('url')).then(this.handleLazyLoad).catch(r => console.error(r))
     }
   }
 
@@ -78,8 +92,20 @@ class Item extends React.PureComponent {
     this.setState({ loaded: true });
   }
 
+  handleLazyLoad = (response) => {
+    let contentType = response.headers.get('Content-Type');
+    contentType = contentType.split("/")[0].trim()
+    console.log("Lazy loaded", contentType)
+    response.blob().then((blob) => {
+      const objectURL = URL.createObjectURL(blob);
+      this.setState({lazyLoadURL: objectURL, lazyLoadContentType: contentType})
+    })
+
+  }
+
   render () {
     const { attachment, index, size, standalone, displayWidth, visible } = this.props;
+    const {lazyLoadURL, lazyLoadContentType, lazyLoadStarted} = this.state;
 
     let width  = 50;
     let height = 100;
@@ -132,19 +158,21 @@ class Item extends React.PureComponent {
 
     let thumbnail = '';
 
-    if (attachment.get('type') === 'unknown') {
+    if (attachment.get('type') === 'unknown' && (!lazyLoadURL || (["image", "video"].indexOf(lazyLoadContentType) < 0))) {
       return (
         <div className={classNames('media-gallery__item', { standalone })} key={attachment.get('id')} style={{ left: left, top: top, right: right, bottom: bottom, width: `${width}%`, height: `${height}%` }}>
-          <a className='media-gallery__item-thumbnail' href={attachment.get('url') || attachment.get('remote_url')} style={{ cursor: 'pointer' }} title={attachment.get('description')} target='_blank' rel='noopener noreferrer'>
+          <a className='media-gallery__item-thumbnail' href={attachment.get('remote_url') || attachment.get('url')} style={{ cursor: 'pointer' }} title={attachment.get('description')} target='_blank' rel='noopener noreferrer' onMouseEnter={this.handleAutoDownload}>
             <Blurhash
               hash={attachment.get('blurhash')}
               className='media-gallery__preview'
               dummy={!useBlurhash}
             />
+            <span className='media-gallery__gifv__label'>{attachment.get('description') || "No Description"}</span>
+            {lazyLoadStarted && <CircularProgress size={30} strokeWidth={3.5} />}
           </a>
         </div>
       );
-    } else if (attachment.get('type') === 'image') {
+    } else if (attachment.get('type') === 'image' || (lazyLoadURL && lazyLoadContentType === 'image')) {
       const previewUrl   = attachment.get('preview_url');
       const previewWidth = attachment.getIn(['meta', 'small', 'width']);
 
@@ -170,7 +198,7 @@ class Item extends React.PureComponent {
           rel='noopener noreferrer'
         >
           <img
-            src={previewUrl}
+            src={lazyLoadURL || previewUrl}
             srcSet={srcSet}
             sizes={sizes}
             alt={attachment.get('description')}
@@ -180,7 +208,7 @@ class Item extends React.PureComponent {
           />
         </a>
       );
-    } else if (attachment.get('type') === 'gifv') {
+    } else if (attachment.get('type') === 'gifv' || (lazyLoadURL && lazyLoadContentType === 'image')) {
       const autoPlay = !isIOS() && this.getAutoPlay();
 
       thumbnail = (
@@ -190,7 +218,7 @@ class Item extends React.PureComponent {
             aria-label={attachment.get('description')}
             title={attachment.get('description')}
             role='application'
-            src={attachment.get('url')}
+            src={lazyLoadURL || attachment.get('url')}
             onClick={this.handleClick}
             onMouseEnter={this.handleMouseEnter}
             onMouseLeave={this.handleMouseLeave}
@@ -335,14 +363,15 @@ class MediaGallery extends React.PureComponent {
     if (standalone && this.isFullSizeEligible()) {
       children = <Item standalone autoplay={autoplay} onClick={this.handleClick} attachment={media.get(0)} displayWidth={width} visible={visible} />;
     } else {
-      children = media.take(4).map((attachment, i) => <Item key={attachment.get('id')} autoplay={autoplay} onClick={this.handleClick} attachment={attachment} index={i} size={size} displayWidth={width} visible={visible || uncached} />);
+      children = media.take(4).map((attachment, i) => <Item key={attachment.get('id')} autoplay={autoplay} {... uncached ? {} : {onClick: this.handleClick} } attachment={attachment} index={i} size={size} displayWidth={width} visible={visible || uncached} />);
     }
 
     if (uncached) {
       spoilerButton = (
-        <button type='button' disabled className='spoiler-button__overlay'>
-          <span className='spoiler-button__overlay__label'>{media.take(4).map(attachment => attachment.get('description')).join(", ")}</span>
-        </button>
+        <div></div>
+        // <button type='button' disabled className='spoiler-button__overlay'>
+        //   <span className='spoiler-button__overlay__label'>{media.take(4).map(attachment => attachment.get('description')).join(", ")}</span>
+        // </button>
       );
     } else if (visible) {
       spoilerButton = <IconButton title={intl.formatMessage(messages.toggle_visible, { number: size })} icon='eye-slash' overlay onClick={this.handleOpen} />;
