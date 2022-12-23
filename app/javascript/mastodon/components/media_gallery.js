@@ -208,7 +208,7 @@ class Item extends React.PureComponent {
           />
         </a>
       );
-    } else if (attachment.get('type') === 'gifv' || (lazyLoadURL && lazyLoadContentType === 'image')) {
+    } else if (attachment.get('type') === 'gifv' || (lazyLoadURL && lazyLoadContentType === 'video')) {
       const autoPlay = !isIOS() && this.getAutoPlay();
 
       thumbnail = (
