@@ -5900,6 +5900,9 @@ a.status-card.compact:hover {
 
   img {
     object-fit: cover;
+    &.lazy-media {
+      object-fit: contain;
+    }
   }
 
   & .circular-progress {
@@ -5941,6 +5944,10 @@ a.status-card.compact:hover {
   transform: translateY(-50%);
   width: 100%;
   z-index: 1;
+
+  &.lazy-media { 
+    object-fit: contain;
+  }
 }
 
 .media-gallery__item-thumbnail-label {

@@ -205,6 +205,7 @@ class Item extends React.PureComponent {
             title={attachment.get('description')}
             style={{ objectPosition: `${x}% ${y}%` }}
             onLoad={this.handleImageLoad}
+            className={lazyLoadURL ? "lazy-media" : ""}
           />
         </a>
       );
@@ -214,7 +215,7 @@ class Item extends React.PureComponent {
       thumbnail = (
         <div className={classNames('media-gallery__gifv', { autoplay: autoPlay })}>
           <video
-            className='media-gallery__item-gifv-thumbnail'
+            className={'media-gallery__item-gifv-thumbnail' + (lazyLoadURL ? " lazy-media" : "") }
             aria-label={attachment.get('description')}
             title={attachment.get('description')}
             role='application'
