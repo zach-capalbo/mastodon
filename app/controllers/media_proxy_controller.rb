@@ -29,6 +29,7 @@ class MediaProxyController < ApplicationController
   private
 
   def redownload!
+    # Rails.logger.warn "Going to download Media!!! media_proxy.rb, #{Setting.download_media_enabled}"
     @media_attachment.download_file!
     @media_attachment.created_at = Time.now.utc
     @media_attachment.save!

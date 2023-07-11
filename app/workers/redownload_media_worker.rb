@@ -11,6 +11,9 @@ class RedownloadMediaWorker
     media_attachment = MediaAttachment.find(id)
 
     return if media_attachment.remote_url.blank?
+    # return unless Setting.download_media_enabled
+
+    # Rails.logger.warn "Going to download Media!!! redownload.rb, #{Setting.download_media_enabled}"
 
     media_attachment.download_file!
     media_attachment.download_thumbnail!

@@ -271,8 +271,12 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
 
         media_attachments << media_attachment
 
+        Rails.logger.info "Trying to create attachment"
+
         next if unsupported_media_type?(media_attachment_parser.file_content_type) || skip_download?
         next unless Setting.download_media_enabled
+
+        Rails.logger.warn "Going to download Media!!! create.rb, #{Setting.download_media_enabled}"
 
         media_attachment.download_file!
         media_attachment.download_thumbnail!

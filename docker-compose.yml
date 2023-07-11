@@ -58,7 +58,7 @@ services:
 
   web:
     build: .
-    image: ghcr.io/mastodon/mastodon
+    # image: ghcr.io/mastodon/mastodon
     restart: always
     container_name: web
     env_file: .env.production
@@ -80,7 +80,7 @@ services:
 
   streaming:
     build: .
-    image: ghcr.io/mastodon/mastodon
+    # image: ghcr.io/mastodon/mastodon
     restart: always
     env_file: .env.production
     command: node ./streaming
@@ -98,7 +98,7 @@ services:
 
   sidekiq:
     build: .
-    image: ghcr.io/mastodon/mastodon
+    # image: ghcr.io/mastodon/mastodon
     restart: always
     env_file: .env.production
     command: bundle exec sidekiq
